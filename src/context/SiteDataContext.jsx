@@ -4,22 +4,158 @@ import { API_CONFIG } from '../data/apiConfig';
 
 const SiteDataContext = createContext(null);
 
-/* ── Mapper: SheetDB row → format UMKM app ── */
+/* ═══════════════════════════════════════════════════════════
+   Google Sheets Response Parser
+   ═══════════════════════════════════════════════════════════
+   Google Sheets gviz/tq mengembalikan format JSONP:
+   google.visualization.Query.setResponse({...});
+
+   Parser ini menangani kasus-kasus khusus:
+   1. parsedNumHeaders=0 → baris pertama = header, bukan data
+   2. Kolom bertipe number (misal WhatsApp) → pakai formatted value
+   3. Cell null → default ke empty string
+   ═══════════════════════════════════════════════════════════ */
+function parseGoogleSheetsResponse(text) {
+  // Extract JSON dari wrapper JSONP
+  const match = text.match(
+    /google\.visualization\.Query\.setResponse\(({.*})\)/s
+  );
+  if (!match) {
+    throw new Error('Format response Google Sheets tidak valid');
+  }
+
+  const json = JSON.parse(match[1]);
+  const table = json.table;
+
+  // ── Tentukan nama kolom (header) ──
+  // Cek apakah Google Sheets mendeteksi header otomatis
+  const hasAutoHeaders = table.cols.some((col) => col.label && col.label.trim() !== '');
+
+  let cols;
+  let dataRows;
+
+  if (hasAutoHeaders) {
+    // Google mendeteksi header → ambil dari cols.label
+    cols = table.cols.map((col) => col.label || '');
+    dataRows = table.rows;
+  } else {
+    // parsedNumHeaders=0 → baris pertama adalah header
+    // Ambil nama kolom dari row pertama
+    cols = table.rows[0].c.map((cell) =>
+      cell ? String(cell.v || '') : ''
+    );
+    dataRows = table.rows.slice(1); // Skip baris header
+  }
+
+  // ── Konversi setiap baris menjadi object { NamaKolom: nilai } ──
+  return dataRows
+    .map((row) => {
+      const obj = {};
+      row.c.forEach((cell, i) => {
+        if (!cols[i]) return;
+
+        if (!cell || cell.v == null) {
+          obj[cols[i]] = '';
+          return;
+        }
+
+        // Gunakan formatted value (f) jika ada, agar angka seperti
+        // nomor WhatsApp (6.285E12) tetap tampil benar ("6285158424337")
+        if (cell.f != null) {
+          obj[cols[i]] = String(cell.f);
+        } else {
+          obj[cols[i]] = cell.v;
+        }
+      });
+      return obj;
+    })
+    .filter((row) => {
+      // Filter baris kosong (semua value empty string)
+      return Object.values(row).some((v) => v !== '');
+    });
+}
+
+/* ═══════════════════════════════════════════════════════════
+   localStorage Cache — Mengurangi fetch & mempercepat load
+   ═══════════════════════════════════════════════════════════ */
+const CACHE_PREFIX = 'desa_paten_data_';
+const CACHE_DURATION = 5 * 60 * 1000; // 5 menit
+
+function getCached(key) {
+  try {
+    const raw = localStorage.getItem(CACHE_PREFIX + key);
+    if (!raw) return null;
+
+    const { data, ts } = JSON.parse(raw);
+    if (Date.now() - ts > CACHE_DURATION) {
+      localStorage.removeItem(CACHE_PREFIX + key);
+      return null; // Cache expired
+    }
+    return data;
+  } catch {
+    return null;
+  }
+}
+
+function setCache(key, data) {
+  try {
+    localStorage.setItem(
+      CACHE_PREFIX + key,
+      JSON.stringify({ data, ts: Date.now() })
+    );
+  } catch {
+    // localStorage penuh atau tidak tersedia — abaikan
+  }
+}
+
+/**
+ * Mengubah URL Google Drive sharing menjadi URL gambar langsung.
+ *
+ * Input:  https://drive.google.com/file/d/FILE_ID/view?usp=sharing
+ * Output: https://lh3.googleusercontent.com/d/FILE_ID
+ *
+ * Jika bukan URL Google Drive, dikembalikan apa adanya.
+ */
+function toDirectImageUrl(url) {
+  if (!url || typeof url !== 'string') return null;
+
+  // Pattern: drive.google.com/file/d/{FILE_ID}/...
+  const driveMatch = url.match(
+    /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/
+  );
+  if (driveMatch) {
+    return `https://lh3.googleusercontent.com/d/${driveMatch[1]}`;
+  }
+
+  // Pattern: drive.google.com/open?id={FILE_ID}
+  const openMatch = url.match(
+    /drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/
+  );
+  if (openMatch) {
+    return `https://lh3.googleusercontent.com/d/${openMatch[1]}`;
+  }
+
+  return url;
+}
+
+/* ── Mapper: row → format UMKM app ── */
 function mapUmkmRow(row, index) {
+  const rawImage = row['Foto'] || row['foto'] || null;
+
   return {
     id: index + 1,
     name: row['Nama'] || row['nama'] || '',
     description: row['Deskripsi'] || row['deskripsi'] || '',
     detailDescription: row['Detail'] || row['detail'] || row['DeskripsiDetail'] || '',
-    image: row['Foto'] || row['foto'] || null,
+    image: toDirectImageUrl(rawImage),
     qris: String(row['QRIS'] || row['qris'] || '').toLowerCase() === 'ya',
     whatsapp: String(row['WhatsApp'] || row['whatsapp'] || ''),
     category: row['Kategori'] || row['kategori'] || 'Lainnya',
-    lokasi: row['Lokasi'] || row['lokasi'] || null,
+    lokasi: row['Lokasi'] || row['lokasi'] || row['Gmaps'] || row['gmaps'] || null,
   };
 }
 
-/* ── Mapper: SheetDB row → format statistik app ── */
+/* ── Mapper: row → format statistik app ── */
 function mapStatsRow(row) {
   return {
     id: String(row['ID'] || row['id'] || row['Label'] || '').toLowerCase(),
@@ -28,6 +164,29 @@ function mapStatsRow(row) {
     description: row['Deskripsi'] || row['deskripsi'] || '',
     icon: row['Icon'] || row['icon'] || 'home',
   };
+}
+
+/**
+ * Fetch data dari Google Sheets langsung.
+ * Cek cache dulu → kalau ada & belum expired, pakai cache.
+ * Kalau tidak ada / expired → fetch dari Google Sheets → simpan cache.
+ */
+async function fetchGoogleSheet(url, cacheKey) {
+  // 1. Cek cache
+  const cached = getCached(cacheKey);
+  if (cached) return cached;
+
+  // 2. Fetch dari Google Sheets
+  const res = await fetch(url);
+  if (!res.ok) throw new Error(`Google Sheets: HTTP ${res.status}`);
+
+  const text = await res.text();
+  const rows = parseGoogleSheetsResponse(text);
+
+  // 3. Simpan ke cache
+  setCache(cacheKey, rows);
+
+  return rows;
 }
 
 /**
@@ -56,21 +215,17 @@ export function SiteDataProvider({ children }) {
       try {
         const updates = {};
 
-        // Fetch UMKM
+        // Fetch UMKM dari Google Sheets
         if (API_CONFIG.umkm) {
-          const res = await fetch(API_CONFIG.umkm);
-          if (!res.ok) throw new Error(`UMKM API: HTTP ${res.status}`);
-          const rows = await res.json();
+          const rows = await fetchGoogleSheet(API_CONFIG.umkm, 'umkm');
           if (Array.isArray(rows) && rows.length > 0) {
             updates.umkm = rows.map(mapUmkmRow);
           }
         }
 
-        // Fetch Statistik
+        // Fetch Statistik dari Google Sheets
         if (API_CONFIG.stats) {
-          const res = await fetch(API_CONFIG.stats);
-          if (!res.ok) throw new Error(`Stats API: HTTP ${res.status}`);
-          const rows = await res.json();
+          const rows = await fetchGoogleSheet(API_CONFIG.stats, 'stats');
           if (Array.isArray(rows) && rows.length > 0) {
             updates.stats = rows.map(mapStatsRow);
           }
@@ -80,7 +235,7 @@ export function SiteDataProvider({ children }) {
           setData((prev) => ({ ...prev, ...updates }));
         }
       } catch (err) {
-        console.error('⚠️ Gagal memuat data dari API:', err);
+        console.error('⚠️ Gagal memuat data dari Google Sheets:', err);
         if (!cancelled) setError(err.message);
         // Data statis dari siteData.js tetap tampil sebagai fallback
       } finally {

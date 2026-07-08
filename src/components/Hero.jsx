@@ -9,7 +9,7 @@ export default function Hero() {
       className="relative min-h-[92vh] flex items-center justify-center overflow-hidden"
       style={{
         background:
-          'linear-gradient(150deg, #071e11 0%, #0e3220 45%, #184d30 100%)',
+          'linear-gradient(150deg, #1a0505 0%, #3b0f0f 45%, #5a1818 100%)',
       }}
     >
       {hero.backgroundImage && (

@@ -1,18 +1,18 @@
 @import 'tailwindcss';
 
 @theme {
-  /* ── Leaf Green palette ── */
-  --color-leaf-50: #f0fdf4;
-  --color-leaf-100: #dcfce7;
-  --color-leaf-200: #bbf7d0;
-  --color-leaf-300: #86efac;
-  --color-leaf-400: #4ade80;
-  --color-leaf-500: #22c55e;
-  --color-leaf-600: #16a34a;
-  --color-leaf-700: #15803d;
-  --color-leaf-800: #166534;
-  --color-leaf-900: #14532d;
-  --color-leaf-950: #052e16;
+  /* ── Maroon palette ── */
+  --color-leaf-50: #fdf2f2;
+  --color-leaf-100: #fce4e4;
+  --color-leaf-200: #fbcdcd;
+  --color-leaf-300: #f6a3a3;
+  --color-leaf-400: #ee6b6b;
+  --color-leaf-500: #c02020;
+  --color-leaf-600: #9b1a1a;
+  --color-leaf-700: #801818;
+  --color-leaf-800: #6c1919;
+  --color-leaf-900: #501414;
+  --color-leaf-950: #2d0a0a;
 
   /* ── Wood / Brown accent ── */
   --color-wood-50: #fdf8f0;
