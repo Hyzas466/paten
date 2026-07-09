@@ -34,7 +34,7 @@ export default function Footer() {
             <h3 className="text-xs font-semibold text-leaf-400 uppercase tracking-widest mb-5">
               Navigasi
             </h3>
-            <ul className="space-y-3 mb-10">
+            <ul className="space-y-3">
               {footerNav.map((link) => (
                 <li key={link.href}>
                   <a
@@ -46,25 +46,6 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-
-            {leadership.length > 0 && (
-              <>
-                <h3 className="text-xs font-semibold text-leaf-400 uppercase tracking-widest mb-5">
-                  Perangkat Desa
-                </h3>
-                <ul className="space-y-3">
-                  {leadership.map((leader, idx) => (
-                    <li key={idx} className="text-sm text-leaf-200/60">
-                      <span className="text-white/90 font-medium">
-                        {leader.position}
-                      </span>
-                      <br />
-                      {leader.name}
-                    </li>
-                  ))}
-                </ul>
-              </>
-            )}
           </div>
 
           {/* ── Column 3 : Contact ── */}
@@ -96,7 +77,7 @@ export default function Footer() {
                 <span>{contact.address}</span>
               </li>
 
-              {/* Phone */}
+              {/* Instagram */}
               <li className="flex items-center gap-3 text-sm text-leaf-200/60">
                 <svg
                   className="w-5 h-5 text-leaf-500 shrink-0"
@@ -105,31 +86,37 @@ export default function Footer() {
                   strokeWidth={1.5}
                   stroke="currentColor"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z"
-                  />
+                  <rect x="2" y="2" width="20" height="20" rx="5" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="12" cy="12" r="5" strokeLinecap="round" strokeLinejoin="round" />
+                  <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none" />
                 </svg>
-                <span>{contact.phone}</span>
+                <a
+                  href="https://www.instagram.com/paten.official_?igsh=ZzZkaTFjM2JmMDFl"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors duration-200"
+                >
+                  @paten.official_
+                </a>
               </li>
 
-              {/* Email */}
+              {/* TikTok */}
               <li className="flex items-center gap-3 text-sm text-leaf-200/60">
                 <svg
                   className="w-5 h-5 text-leaf-500 shrink-0"
-                  fill="none"
+                  fill="currentColor"
                   viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75"
-                  />
+                  <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.34-6.34V9.49a8.24 8.24 0 004.78 1.53V7.57a4.84 4.84 0 01-1.02-.88z" />
                 </svg>
-                <span>{contact.email}</span>
+                <a
+                  href="https://www.tiktok.com/@kartarpemudapemudipaten"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors duration-200"
+                >
+                  @kartarpemudapemudipaten
+                </a>
               </li>
             </ul>
           </div>
