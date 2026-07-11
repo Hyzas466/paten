@@ -51,30 +51,26 @@ export default function Footer() {
           {/* ── Column 3 : Contact ── */}
           <div>
             <h3 className="text-xs font-semibold text-leaf-400 uppercase tracking-widest mb-5">
-              Kontak
+              Medsos
             </h3>
             <ul className="space-y-5">
-              {/* Address */}
-              <li className="flex items-start gap-3 text-sm text-leaf-200/60">
+              {/* YouTube */}
+              <li className="flex items-center gap-3 text-sm text-leaf-200/60">
                 <svg
-                  className="w-5 h-5 text-leaf-500 mt-0.5 shrink-0"
-                  fill="none"
+                  className="w-5 h-5 text-leaf-500 shrink-0"
+                  fill="currentColor"
                   viewBox="0 0 24 24"
-                  strokeWidth={1.5}
-                  stroke="currentColor"
                 >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"
-                  />
+                  <path d="M23.498 6.186a3.016 3.016 0 00-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 00.502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 002.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 002.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z" />
                 </svg>
-                <span>{contact.address}</span>
+                <a
+                  href="https://youtube.com/@patenofficial5242?si=ofQXizmBfTG0fCD9"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:text-white transition-colors duration-200"
+                >
+                  @patenofficial5242
+                </a>
               </li>
 
               {/* Instagram */}
