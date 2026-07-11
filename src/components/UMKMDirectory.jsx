@@ -105,6 +105,8 @@ function UMKMModal({ item, onClose }) {
               src={item.image}
               alt={item.name}
               className="w-full h-full object-cover"
+              onError={(e) => { e.target.style.display = 'none'; }}
+              referrerPolicy="no-referrer"
             />
           ) : (
             <div className="flex flex-col items-center justify-center gap-2">
@@ -219,6 +221,8 @@ export default function UMKMDirectory() {
                           src={item.image}
                           alt={item.name}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          onError={(e) => { e.target.style.display = 'none'; }}
+                          referrerPolicy="no-referrer"
                         />
                       ) : (
                         <ImagePlaceholder />
