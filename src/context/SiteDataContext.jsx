@@ -109,30 +109,34 @@ function setCache(key, data) {
 }
 
 /**
- * Mengubah URL Google Drive sharing menjadi URL gambar langsung.
+ * Mengubah URL gambar dari spreadsheet menjadi URL yang bisa ditampilkan.
  *
- * Google Drive sharing links tidak bisa langsung dipakai di <img>.
- * Solusi: gunakan endpoint thumbnail yang lebih reliable.
- *
- * Input:  https://drive.google.com/file/d/FILE_ID/view?usp=sharing
- * Output: https://drive.google.com/thumbnail?id=FILE_ID&sz=w800
- *
- * Jika bukan URL Google Drive, dikembalikan apa adanya.
+ * Kasus yang ditangani:
+ * 1. Google Drive file → thumbnail endpoint
+ * 2. Google Drive FOLDER → return null (folder bukan gambar!)
+ * 3. Discord CDN → pakai langsung (perlu referrerPolicy="no-referrer")
+ * 4. URL lain → pakai apa adanya
  */
 function toDirectImageUrl(url) {
   if (!url || typeof url !== 'string') return null;
 
   const trimmed = url.trim();
+  if (!trimmed || trimmed === 'null') return null;
 
-  // Pattern: drive.google.com/file/d/{FILE_ID}/...
-  const driveMatch = trimmed.match(
-    /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/
-  );
-  if (driveMatch) {
-    return `https://drive.google.com/thumbnail?id=${driveMatch[1]}&sz=w800`;
+  // ❌ Google Drive FOLDER — bukan gambar, skip
+  if (/drive\.google\.com\/drive\/folders\//.test(trimmed)) {
+    return null;
   }
 
-  // Pattern: drive.google.com/open?id={FILE_ID}
+  // ✅ Google Drive file: /file/d/{FILE_ID}/...
+  const driveFileMatch = trimmed.match(
+    /drive\.google\.com\/file\/d\/([a-zA-Z0-9_-]+)/
+  );
+  if (driveFileMatch) {
+    return `https://drive.google.com/thumbnail?id=${driveFileMatch[1]}&sz=w800`;
+  }
+
+  // ✅ Google Drive: open?id={FILE_ID}
   const openMatch = trimmed.match(
     /drive\.google\.com\/open\?id=([a-zA-Z0-9_-]+)/
   );
@@ -140,14 +144,16 @@ function toDirectImageUrl(url) {
     return `https://drive.google.com/thumbnail?id=${openMatch[1]}&sz=w800`;
   }
 
-  // Pattern: drive.usercontent.google.com/download?id={FILE_ID}
+  // ✅ Google Drive: uc?id={FILE_ID} atau export?id=
   const ucMatch = trimmed.match(
-    /drive\.usercontent\.google\.com\/download\?id=([a-zA-Z0-9_-]+)/
+    /drive\.google\.com\/(?:uc|export)\?.*id=([a-zA-Z0-9_-]+)/
   );
   if (ucMatch) {
     return `https://drive.google.com/thumbnail?id=${ucMatch[1]}&sz=w800`;
   }
 
+  // ✅ Discord CDN — bisa langsung dipakai (dengan referrerPolicy="no-referrer")
+  // ✅ URL gambar biasa (imgur, cloudinary, dsb) — langsung pakai
   return trimmed;
 }
 

@@ -157,13 +157,13 @@ export const siteConfig = {
     wilayah: {
       title: 'Peta Wilayah',
       description: 'Peta lokasi dan batas wilayah Desa Paten',
-      embedUrl: null, // Ganti dengan Google Maps embed URL
-      image: null, // Atau: '/images/peta-wilayah.jpg'
+      embedUrl: null,
+      image: '/Peta Paten (Wilayah).jpeg',
     },
     administrasi: {
       title: 'Peta Administrasi',
       description: 'Peta administrasi wilayah',
-      image: null, // Ganti: '/images/peta-administrasi.jpg'
+      image: '/Peta Paten (administrasi).jpg.jpeg',
     },
   },
 
