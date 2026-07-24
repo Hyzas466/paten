@@ -79,7 +79,8 @@ function parseGoogleSheetsResponse(text) {
    localStorage Cache — Mengurangi fetch & mempercepat load
    ═══════════════════════════════════════════════════════════ */
 const CACHE_PREFIX = 'desa_paten_data_';
-const CACHE_DURATION = 5 * 60 * 1000; // 5 menit
+const CACHE_DURATION = 30 * 1000; // 30 detik — agar perubahan spreadsheet cepat tampil
+const POLL_INTERVAL = 30 * 1000; // Polling setiap 30 detik
 
 function getCached(key) {
   try {
@@ -190,10 +191,12 @@ function mapStatsRow(row) {
  * Cek cache dulu → kalau ada & belum expired, pakai cache.
  * Kalau tidak ada / expired → fetch dari Google Sheets → simpan cache.
  */
-async function fetchGoogleSheet(url, cacheKey) {
-  // 1. Cek cache
-  const cached = getCached(cacheKey);
-  if (cached) return cached;
+async function fetchGoogleSheet(url, cacheKey, skipCache = false) {
+  // 1. Cek cache (skip jika force refresh)
+  if (!skipCache) {
+    const cached = getCached(cacheKey);
+    if (cached) return cached;
+  }
 
   // 2. Fetch dari Google Sheets
   const res = await fetch(url);
@@ -230,13 +233,13 @@ export function SiteDataProvider({ children }) {
 
     let cancelled = false;
 
-    async function fetchAll() {
+    async function fetchAll(skipCache = false) {
       try {
         const updates = {};
 
         // Fetch UMKM dari Google Sheets
         if (API_CONFIG.umkm) {
-          const rows = await fetchGoogleSheet(API_CONFIG.umkm, 'umkm');
+          const rows = await fetchGoogleSheet(API_CONFIG.umkm, 'umkm', skipCache);
           if (Array.isArray(rows) && rows.length > 0) {
             updates.umkm = rows.map(mapUmkmRow);
           }
@@ -244,7 +247,7 @@ export function SiteDataProvider({ children }) {
 
         // Fetch Statistik dari Google Sheets
         if (API_CONFIG.stats) {
-          const rows = await fetchGoogleSheet(API_CONFIG.stats, 'stats');
+          const rows = await fetchGoogleSheet(API_CONFIG.stats, 'stats', skipCache);
           if (Array.isArray(rows) && rows.length > 0) {
             updates.stats = rows.map(mapStatsRow);
           }
@@ -262,10 +265,17 @@ export function SiteDataProvider({ children }) {
       }
     }
 
+    // Fetch awal
     fetchAll();
+
+    // Auto-polling: refresh data setiap 30 detik (skip cache)
+    const pollId = setInterval(() => {
+      if (!cancelled) fetchAll(true);
+    }, POLL_INTERVAL);
 
     return () => {
       cancelled = true;
+      clearInterval(pollId);
     };
   }, []);
 

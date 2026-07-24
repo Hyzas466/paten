@@ -5,7 +5,7 @@ const navLinks = [
   { label: 'Tentang', href: '#tentang' },
   { label: 'UMKM', href: '#umkm' },
   { label: 'Peta', href: '#peta' },
-  { label: 'Medsos', href: '#kontak' },
+  { label: 'Media Sosial', href: '#kontak' },
 ];
 
 export default function Navbar() {
@@ -29,14 +29,28 @@ export default function Navbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 md:h-20">
           {/* Logo */}
-          <a
-            href="#beranda"
-            className={`font-semibold tracking-tight transition-colors duration-300 ${
-              scrolled ? 'text-leaf-800' : 'text-white'
-            }`}
-          >
-            Desa Paten
-          </a>
+          <div className="flex items-center gap-2">
+            <a
+              href="https://www.instagram.com/swarapaten/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0"
+            >
+              <img
+                src="/logo paten.png"
+                alt="Logo Padukuhan Paten"
+                className="w-8 h-8 md:w-9 md:h-9 rounded-full object-cover"
+              />
+            </a>
+            <a
+              href="#beranda"
+              className={`font-semibold tracking-tight transition-colors duration-300 ${
+                scrolled ? 'text-leaf-800' : 'text-white'
+              }`}
+            >
+              Padukuhan Paten
+            </a>
+          </div>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-1">
