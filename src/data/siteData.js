@@ -53,6 +53,12 @@ export const siteConfig = {
     },
   ],
 
+  /* ─── Fasilitas Umum (fallback — data utama dari Spreadsheet) ─── */
+  fasilitas: [],
+
+  /* ─── Kebudayaan & Kesenian (fallback — data utama dari Spreadsheet) ─── */
+  kebudayaan: [],
+
   /* ─── Direktori UMKM ─── */
   umkm: [
     {

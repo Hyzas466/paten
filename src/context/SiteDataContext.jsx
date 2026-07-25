@@ -49,22 +49,24 @@ function parseGoogleSheetsResponse(text) {
 
   // ── Konversi setiap baris menjadi object { NamaKolom: nilai } ──
   return dataRows
+    .filter((row) => row && row.c) // Skip null rows
     .map((row) => {
       const obj = {};
-      row.c.forEach((cell, i) => {
-        if (!cols[i]) return;
+      cols.forEach((colName, i) => {
+        if (!colName) return;
 
+        const cell = row.c[i];
         if (!cell || cell.v == null) {
-          obj[cols[i]] = '';
+          obj[colName] = '';
           return;
         }
 
         // Gunakan formatted value (f) jika ada, agar angka seperti
         // nomor WhatsApp (6.285E12) tetap tampil benar ("6285158424337")
         if (cell.f != null) {
-          obj[cols[i]] = String(cell.f);
+          obj[colName] = String(cell.f);
         } else {
-          obj[cols[i]] = cell.v;
+          obj[colName] = cell.v;
         }
       });
       return obj;
@@ -158,6 +160,16 @@ function toDirectImageUrl(url) {
   return trimmed;
 }
 
+/* ═══════════════════════════════════════════════════════════
+   Mapper: row → format yang dipakai komponen
+   ═══════════════════════════════════════════════════════════
+   Satu sheet "Potensi Paten" berisi semua data.
+   Kolom "Section" menentukan kategori:
+   - "Fasilitas Umum"         → untuk komponen Fasilitas
+   - "Direktori UMKM"         → untuk komponen UMKMDirectory
+   - "Kebudayaan dan Kesenian" → untuk komponen Kebudayaan
+   ═══════════════════════════════════════════════════════════ */
+
 /* ── Mapper: row → format UMKM app ── */
 function mapUmkmRow(row, index) {
   const rawImage = row['Foto'] || row['foto'] || null;
@@ -175,15 +187,44 @@ function mapUmkmRow(row, index) {
   };
 }
 
-/* ── Mapper: row → format statistik app ── */
-function mapStatsRow(row) {
+/* ── Mapper: row → format fasilitas app ── */
+function mapFasilitasRow(row, index) {
+  const rawImage = row['Foto'] || row['foto'] || null;
+
   return {
-    id: String(row['ID'] || row['id'] || row['Label'] || '').toLowerCase(),
-    label: row['Label'] || row['label'] || '',
-    value: parseInt(row['Nilai'] || row['nilai'] || 0, 10),
+    id: index + 1,
+    name: row['Nama'] || row['nama'] || '',
     description: row['Deskripsi'] || row['deskripsi'] || '',
-    icon: row['Icon'] || row['icon'] || 'home',
+    category: row['Kategori'] || row['kategori'] || 'Umum',
+    gmaps: row['Gmaps'] || row['gmaps'] || row['Lokasi'] || row['lokasi'] || null,
+    image: toDirectImageUrl(rawImage),
   };
+}
+
+/* ── Mapper: row → format kebudayaan app ── */
+function mapKebudayaanRow(row, index) {
+  const rawImage = row['Foto'] || row['foto'] || null;
+
+  return {
+    id: index + 1,
+    name: row['Nama'] || row['nama'] || '',
+    description: row['Deskripsi'] || row['deskripsi'] || '',
+    category: row['Kategori'] || row['kategori'] || 'Budaya',
+    gmaps: row['Gmaps'] || row['gmaps'] || row['Lokasi'] || row['lokasi'] || null,
+    image: toDirectImageUrl(rawImage),
+  };
+}
+
+/**
+ * Menentukan section dari value kolom "Section" di spreadsheet.
+ * Menggunakan matching fleksibel agar typo kecil tetap terdeteksi.
+ */
+function detectSection(sectionValue) {
+  const s = String(sectionValue || '').toLowerCase().trim();
+  if (s.includes('umkm')) return 'umkm';
+  if (s.includes('fasilitas')) return 'fasilitas';
+  if (s.includes('budaya') || s.includes('kesenian') || s.includes('kebudayaan')) return 'kebudayaan';
+  return 'unknown';
 }
 
 /**
@@ -220,13 +261,13 @@ async function fetchGoogleSheet(url, cacheKey, skipCache = false) {
 export function SiteDataProvider({ children }) {
   const [data, setData] = useState(siteConfig);
   const [loading, setLoading] = useState(() =>
-    Boolean(API_CONFIG.umkm || API_CONFIG.stats)
+    Boolean(API_CONFIG.potensi)
   );
   const [error, setError] = useState(null);
 
   useEffect(() => {
     // Tidak ada API URL? Langsung pakai data statis.
-    if (!API_CONFIG.umkm && !API_CONFIG.stats) {
+    if (!API_CONFIG.potensi) {
       setLoading(false);
       return;
     }
@@ -237,19 +278,42 @@ export function SiteDataProvider({ children }) {
       try {
         const updates = {};
 
-        // Fetch UMKM dari Google Sheets
-        if (API_CONFIG.umkm) {
-          const rows = await fetchGoogleSheet(API_CONFIG.umkm, 'umkm', skipCache);
+        // ── Fetch Potensi Paten (gabungan Fasilitas + UMKM + Kebudayaan) ──
+        if (API_CONFIG.potensi) {
+          const rows = await fetchGoogleSheet(API_CONFIG.potensi, 'potensi', skipCache);
           if (Array.isArray(rows) && rows.length > 0) {
-            updates.umkm = rows.map(mapUmkmRow);
-          }
-        }
+            // Pisahkan berdasarkan kolom "Section"
+            const fasilitasRows = [];
+            const umkmRows = [];
+            const kebudayaanRows = [];
 
-        // Fetch Statistik dari Google Sheets
-        if (API_CONFIG.stats) {
-          const rows = await fetchGoogleSheet(API_CONFIG.stats, 'stats', skipCache);
-          if (Array.isArray(rows) && rows.length > 0) {
-            updates.stats = rows.map(mapStatsRow);
+            rows.forEach((row) => {
+              const section = detectSection(row['Section'] || row['section']);
+              switch (section) {
+                case 'fasilitas':
+                  fasilitasRows.push(row);
+                  break;
+                case 'umkm':
+                  umkmRows.push(row);
+                  break;
+                case 'kebudayaan':
+                  kebudayaanRows.push(row);
+                  break;
+                default:
+                  // Baris tanpa section yang valid → abaikan
+                  break;
+              }
+            });
+
+            if (fasilitasRows.length > 0) {
+              updates.fasilitas = fasilitasRows.map(mapFasilitasRow);
+            }
+            if (umkmRows.length > 0) {
+              updates.umkm = umkmRows.map(mapUmkmRow);
+            }
+            if (kebudayaanRows.length > 0) {
+              updates.kebudayaan = kebudayaanRows.map(mapKebudayaanRow);
+            }
           }
         }
 
@@ -290,7 +354,7 @@ export function SiteDataProvider({ children }) {
  * Hook untuk mengakses data site dari context.
  * Gunakan di semua komponen yang butuh data:
  *
- *   const { umkm, stats, loading } = useSiteData();
+ *   const { umkm, fasilitas, kebudayaan, loading } = useSiteData();
  */
 export function useSiteData() {
   const ctx = useContext(SiteDataContext);

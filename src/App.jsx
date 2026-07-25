@@ -1,7 +1,9 @@
 import Navbar from './components/Navbar';
 import Hero from './components/Hero';
 import About from './components/About';
+import Fasilitas from './components/Fasilitas';
 import UMKMDirectory from './components/UMKMDirectory';
+import Kebudayaan from './components/Kebudayaan';
 import MapSection from './components/MapSection';
 import Footer from './components/Footer';
 
@@ -12,7 +14,9 @@ function App() {
       <main>
         <Hero />
         <About />
+        <Fasilitas />
         <UMKMDirectory />
+        <Kebudayaan />
         <MapSection />
       </main>
       <Footer />

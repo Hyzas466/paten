@@ -12,31 +12,31 @@
  *  4. Paste ID tersebut di variabel SPREADSHEET_ID di bawah.
  *
  *  CATATAN PENTING:
- *  - Gratis tanpa batas request! (tidak pakai SheetDB lagi)
- *  - Cukup ganti SPREADSHEET_ID dan nama sheet saja.
+ *  - Cukup 1 TAB SHEET bernama "Potensi Paten".
+ *  - Pisahkan kategori data menggunakan kolom "Section":
+ *    - Fasilitas Umum
+ *    - Direktori UMKM
+ *    - Kebudayaan dan Kesenian
  *
  * ═══════════════════════════════════════════════════════════════
  */
 
-// ┌─────────────────────────────────────────────────────────────┐
-// │  GANTI NILAI DI BAWAH DENGAN SPREADSHEET ID ANDA           │
-// │  Contoh: '1BxiMVs0XRA5nFMdKvBdBZjgmUUqptlbs74OgVE2upms'   │
-// └─────────────────────────────────────────────────────────────┘
+// ┌───────────────────────────────────────────────────────────┐
+// │  SPREADSHEET ID ANDA                                      │
+// └───────────────────────────────────────────────────────────┘
 const SPREADSHEET_ID = '1E7SBfDyWBZ6RXDo7rESduNuWayhB2NFKHGSoEN8qkSM';
 
-// ┌─────────────────────────────────────────────────────────────┐
-// │  NAMA SHEET (TAB) DI SPREADSHEET UNTUK DESA PATEN          │
-// │  Sesuaikan dengan nama tab yang ada di spreadsheet Anda.    │
-// └─────────────────────────────────────────────────────────────┘
-const SHEET_UMKM = 'UMKM Paten';
-const SHEET_STATS = 'Statistik Paten';
+// ┌───────────────────────────────────────────────────────────┐
+// │  HANYA 1 TAB SHEET: "Potensi Paten"                       │
+// └───────────────────────────────────────────────────────────┘
+const SHEET_POTENSI = 'Potensi Paten';
 
 /**
  * Membangun URL Google Sheets gviz/tq untuk mengambil data
  * langsung dari Google tanpa perantara SheetDB.
  */
 function buildGoogleSheetsUrl(sheetName) {
-  return `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}`;
+  return `https://docs.google.com/spreadsheets/d/${SPREADSHEET_ID}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheetName)}&_=${Date.now()}`;
 }
 
 // Cek apakah Spreadsheet ID sudah dikonfigurasi
@@ -44,14 +44,7 @@ const isConfigured = SPREADSHEET_ID !== 'PASTE_SPREADSHEET_ID_DISINI';
 
 export const API_CONFIG = {
   /**
-   * URL untuk data UMKM (Tab: UMKM Paten).
-   * Otomatis null jika Spreadsheet ID belum di-set → pakai data statis.
+   * Single URL untuk data Potensi Paten (Fasilitas + UMKM + Kebudayaan).
    */
-  umkm: isConfigured ? buildGoogleSheetsUrl(SHEET_UMKM) : null,
-
-  /**
-   * URL untuk data statistik demografi (Tab: Statistik Paten).
-   * Otomatis null jika Spreadsheet ID belum di-set → pakai data statis.
-   */
-  stats: isConfigured ? buildGoogleSheetsUrl(SHEET_STATS) : null,
+  potensi: isConfigured ? buildGoogleSheetsUrl(SHEET_POTENSI) : null,
 };
