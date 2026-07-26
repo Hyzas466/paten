@@ -25,7 +25,7 @@ export const siteConfig = {
     subtitle:
       'Portal informasi resmi Desa Paten, Kelurahan Tuksono, Kecamatan Sentolo, Kabupaten Kulon Progo, Daerah Istimewa Yogyakarta. Temukan potensi desa, produk UMKM unggulan, dan informasi layanan masyarakat.',
     ctaText: 'Jelajahi Potensi',
-    backgroundImage: null, // Ganti dengan path: '/images/hero.jpg'
+    backgroundImage: '/images/gapura paten.png',
   },
 
   /* ─── Statistik Demografi ─── */
@@ -169,7 +169,7 @@ export const siteConfig = {
     administrasi: {
       title: 'Peta Administrasi',
       description: 'Peta administrasi wilayah',
-      image: '/Peta Paten (administrasi).jpg.jpeg',
+      image: '/images/Peta Paten Baru adminstrasi.png',
     },
   },
 
@@ -184,6 +184,6 @@ export const siteConfig = {
       'Menjaga dan melestarikan budaya lokal serta kelestarian alam lingkungan sekitar.',
       'Menyelenggarakan tata kelola informasi desa yang transparan dan mudah diakses.'
     ],
-    image: null, // Ganti dengan gambar profil desa
+    image: '/images/gapura paten.png',
   },
 };
