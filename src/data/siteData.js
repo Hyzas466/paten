@@ -169,7 +169,7 @@ export const siteConfig = {
     administrasi: {
       title: 'Peta Administrasi',
       description: 'Peta administrasi wilayah',
-      image: '/images/Peta Paten Baru adminstrasi.png',
+      image: '/images/peta administrasi paten.png',
     },
   },
 
