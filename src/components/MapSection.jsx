@@ -135,7 +135,7 @@ export default function MapSection() {
               Lokasi &amp; Wilayah
             </p>
             <h2 className="text-2xl md:text-[1.7rem] font-semibold text-leaf-900">
-              Peta Desa Paten
+              Peta Padukuhan Paten
             </h2>
           </div>
 

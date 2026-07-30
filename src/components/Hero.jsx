@@ -40,7 +40,7 @@ export default function Hero() {
         >
           <img
             src={hero.backgroundImage}
-            alt="Gapura Desa Paten"
+            alt="Gapura Padukuhan Paten"
             className="w-full h-full object-cover"
             style={{
               filter: 'brightness(0.5) saturate(1.2)',

@@ -30,7 +30,7 @@ export default function Footer() {
               Padukuhan {padukuhan.name}
             </h3>
             <p className="text-leaf-200/60 text-sm leading-relaxed">
-              Portal informasi resmi Padukuhan {padukuhan.name}, Desa{' '}
+              Portal informasi resmi Padukuhan {padukuhan.name}, Kelurahan{' '}
               {padukuhan.desa}, Kecamatan {padukuhan.kecamatan}, Kabupaten{' '}
               {padukuhan.kabupaten}, {padukuhan.provinsi}.
             </p>
@@ -133,7 +133,7 @@ export default function Footer() {
 
           {/* Copyright */}
           <p className="text-center text-sm text-leaf-200/40">
-            &copy; {year} Padukuhan {padukuhan.name}, Desa {padukuhan.desa} | KKN UPN Veteran Yogyakarta
+            &copy; {year} Padukuhan {padukuhan.name}, Kelurahan {padukuhan.desa} | KKN UPN Veteran Yogyakarta
           </p>
         </div>
       </div>

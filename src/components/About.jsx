@@ -46,7 +46,7 @@ export default function About() {
                     d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75v.75h-.75v-.75zm0 3.5h.75v.75h-.75v-.75zm0 3.5h.75v.75h-.75v-.75zm0 3.5h.75v.75h-.75v-.75zm3.5-10.5h.75v.75h-.75v-.75zm0 3.5h.75v.75h-.75v-.75zm0 3.5h.75v.75h-.75v-.75zm0 3.5h.75v.75h-.75v-.75zm3.5-10.5h.75v.75h-.75v-.75zm0 3.5h.75v.75h-.75v-.75zm0 3.5h.75v.75h-.75v-.75zm0 3.5h.75v.75h-.75v-.75z"
                   />
                 </svg>
-                <span className="text-xs text-leaf-700 font-medium">Foto Profil Desa</span>
+                <span className="text-xs text-leaf-700 font-medium">Foto Profil Padukuhan</span>
                 <span className="text-[10px] text-gray-400 mt-1">Tambahkan berkas gambar di siteData.js</span>
               </div>
             )}

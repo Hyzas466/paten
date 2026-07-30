@@ -197,7 +197,7 @@ export default function UMKMDirectory() {
               Direktori UMKM
             </h2>
             <p className="text-gray-400 max-w-md mx-auto text-sm leading-relaxed">
-              Produk UMKM unggulan dari Desa Paten. Dukung ekonomi lokal
+              Produk UMKM unggulan dari Padukuhan Paten. Dukung ekonomi lokal
               dengan membeli langsung dari warga kami.
             </p>
           </div>
