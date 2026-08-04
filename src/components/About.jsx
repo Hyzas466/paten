@@ -19,12 +19,12 @@ export default function About() {
         </div>
 
         {/* Content Layout */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
           
-          {/* Left Column: Image/Placeholder & Sejarah (7 cols) */}
-          <div className="lg:col-span-7 space-y-6">
+          {/* Left Column: Image → Sejarah → Visi */}
+          <div className="flex flex-col gap-6">
             {about.image ? (
-              <div className="rounded-xl overflow-hidden shadow-sm border border-warm-200 aspect-[16/9]">
+              <div className="rounded-xl overflow-hidden shadow-sm border border-warm-200 aspect-[16/10]">
                 <img
                   src={about.image}
                   alt={about.title}
@@ -32,7 +32,7 @@ export default function About() {
                 />
               </div>
             ) : (
-              <div className="rounded-xl bg-warm-100 border border-warm-200 aspect-[16/9] flex flex-col items-center justify-center text-center p-6">
+              <div className="rounded-xl bg-warm-100 border border-warm-200 aspect-[16/10] flex flex-col items-center justify-center text-center p-6">
                 <svg
                   className="w-12 h-12 text-warm-300 mb-2"
                   fill="none"
@@ -51,44 +51,48 @@ export default function About() {
               </div>
             )}
 
-            <div className="space-y-4">
+            <div className="space-y-3">
               <h3 className="text-base font-semibold text-gray-800">Sejarah Singkat</h3>
               <p className="text-sm text-gray-500 leading-relaxed font-light">
                 {about.sejarah}
               </p>
             </div>
-          </div>
 
-          {/* Right Column: Visi & Misi (5 cols) */}
-          <div className="lg:col-span-5 space-y-8 bg-white p-8 rounded-xl border border-warm-200 shadow-sm">
-            {/* Visi */}
-            <div className="space-y-3">
-              <h3 className="text-xs font-semibold text-leaf-700 uppercase tracking-wider">
+            {/* Visi – quote card */}
+            <div className="bg-warm-100/60 rounded-xl p-6 border-l-4 border-leaf-500 mt-auto">
+              <h3 className="text-xs font-bold text-leaf-600 uppercase tracking-wider mb-3">
                 Visi
               </h3>
-              <p className="text-sm text-gray-600 leading-relaxed font-medium">
+              <p className="text-sm text-gray-700 leading-relaxed italic font-medium">
                 "{about.visi}"
               </p>
             </div>
+          </div>
 
-            {/* Misi */}
-            <div className="space-y-4">
-              <h3 className="text-xs font-semibold text-leaf-700 uppercase tracking-wider">
-                Misi
-              </h3>
-              <ul className="space-y-3">
-                {about.misi.map((item, idx) => (
-                  <li key={idx} className="flex items-start gap-3">
-                    <span className="flex-shrink-0 w-5 h-5 rounded-full bg-leaf-50 text-leaf-600 flex items-center justify-center text-xs font-semibold mt-0.5">
-                      {idx + 1}
-                    </span>
-                    <p className="text-xs text-gray-500 leading-relaxed font-light">
-                      {item}
-                    </p>
-                  </li>
-                ))}
-              </ul>
-            </div>
+          {/* Right Column: Misi – full height card */}
+          <div className="bg-white rounded-xl border border-warm-200 shadow-sm p-6 lg:p-8 flex flex-col">
+            <h3 className="text-xs font-bold text-leaf-600 uppercase tracking-wider mb-5">
+              Misi
+            </h3>
+            <ol className="flex-1 flex flex-col">
+              {about.misi.map((item, idx) => (
+                <li
+                  key={idx}
+                  className={`flex items-start gap-4 py-4 ${
+                    idx !== about.misi.length - 1
+                      ? 'border-b border-leaf-100'
+                      : ''
+                  }`}
+                >
+                  <span className="flex-shrink-0 w-7 h-7 rounded-full bg-leaf-500 text-white flex items-center justify-center text-xs font-bold mt-0.5">
+                    {idx + 1}
+                  </span>
+                  <p className="text-[13px] text-gray-600 leading-relaxed">
+                    {item}
+                  </p>
+                </li>
+              ))}
+            </ol>
           </div>
 
         </div>
